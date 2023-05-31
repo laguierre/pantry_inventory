@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "392773619813",
+    "project_id": "morfistock",
+    "storage_bucket": "morfistock.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392773619813:android:bab5f1aaa3a12d1772368c",
+        "android_client_info": {
+          "package_name": "com.example.pantry_inventory"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "392773619813-u32u0rncsktoqk52nr3thm4s2da3pmdh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pantry_inventory",
+            "certificate_hash": "c759c03b2c92b8b8a892cce27a65c8327357af35"
+          }
+        },
+        {
+          "client_id": "392773619813-gs307pibmn0004bhlc7nlpsusju4afrg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUnflAPvT7q0HA2cTMHMFD17ls2WAlDWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "392773619813-gs307pibmn0004bhlc7nlpsusju4afrg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

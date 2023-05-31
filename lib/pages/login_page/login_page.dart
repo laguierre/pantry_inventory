@@ -6,6 +6,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pantry_inventory/pages/register_page/register_page.dart';
+import 'package:pantry_inventory/services/register_firebase.dart';
+import 'package:pantry_inventory/services/register_google.dart';
 import 'package:pantry_inventory/widgets.dart';
 
 import '../../constants.dart';
@@ -31,9 +33,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     super.initState();
     controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
-
     animation = Tween<double>(begin: 0.0, end: 1.0).animate(controller);
-
   }
 
   @override
@@ -84,8 +84,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                             Navigator.push(
                                 context,
                                 PageTransition(
-                                  opaque: true,
-                                  duration: const Duration(milliseconds: 800),
+                                    opaque: true,
+                                    duration: const Duration(milliseconds: 600),
                                     type: PageTransitionType.bottomToTop,
                                     child: RegisterPage()));
                           });
@@ -101,7 +101,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         title: 'Ingresar',
                         onPressed: () {
                           controller.forward();
-
                         },
                       ),
                     )
@@ -165,10 +164,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                               style: GoogleFonts.outfit(
                                   fontSize: 22, color: kBackgroundColor),
                             ),
-                            const SizedBox(height: 15),
+                            const SizedBox(height: 10),
                             CustomTextField(
                               textEditingController: emailTextController,
                               hintText: 'Ingrese su email...',
+                              textInputType: TextInputType.emailAddress,
                               icon: Icons.email_outlined,
                             ),
                             const SizedBox(height: 15),
@@ -177,25 +177,36 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                               style: GoogleFonts.outfit(
                                   fontSize: 22, color: kBackgroundColor),
                             ),
-                            const SizedBox(height: 15),
+                            const SizedBox(height: 10),
                             CustomTextField(
-                              textEditingController: emailTextController,
+                              obscureText: true,
+                              textEditingController: passTextController,
                               hintText: 'Password',
                               icon: Icons.lock_outline,
                             ),
-                            SizedBox(height: size.height * 0.10),
+                            SizedBox(height: size.height * 0.11),
                             WideButton(
                                 backgroundColor: kBackgroundColor,
                                 titleColor: Colors.white,
-                                title: 'Login',
-                                onPressed: () {}),
+                                title: 'Acceder',
+                                onPressed: () {
+                                  if(emailTextController.text.isEmpty || passTextController.text.isEmpty){
+                                    showAlert(context, 'Error', 'Email o Password vacío', Icons.error);
+                                  }
+                                  else {
+                                    firebaseSignUserIn(
+                                        context, emailTextController.text,
+                                        passTextController.text);
+                                  }}),
                             const SizedBox(height: 15),
                             WideButton(
                                 backgroundColor: kBackgroundColor,
                                 titleColor: Colors.white,
-                                title: 'Login con ',
+                                title: 'Acceder con ',
                                 isSignedGoogle: true,
-                                onPressed: () {}),
+                                onPressed: () {
+                                  AuthService().signInWithGoogle();
+                                }),
                             const SizedBox(height: 12),
                             Row(
                               children: [
@@ -210,11 +221,13 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                     setState(() {
                                       isFinishContainer = true;
                                     });
-                                    controller.reverse().then((value) => Navigator.push(
-                                        context,
-                                        PageTransition(
-                                            type: PageTransitionType.bottomToTop,
-                                            child: RegisterPage())));
+                                    controller.reverse().then((value) =>
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                type: PageTransitionType
+                                                    .bottomToTop,
+                                                child: RegisterPage())));
                                   },
                                   child: Text(
                                     'Registrese.',
@@ -326,5 +339,3 @@ class TitleApp extends StatelessWidget {
     );
   }
 }
-
-
