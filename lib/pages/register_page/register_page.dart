@@ -13,7 +13,7 @@ import '../../widgets.dart';
 import '../login_page/login_page.dart';
 
 class RegisterPage extends StatefulWidget {
-  RegisterPage({Key? key}) : super(key: key);
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -88,6 +88,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     topRight: Radius.circular(30),
                     topLeft: Radius.circular(30))),
             child: SingleChildScrollView(
+              keyboardDismissBehavior:
+              ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.only(bottom: 30),
               physics: const BouncingScrollPhysics(),
               child: Column(
@@ -177,25 +179,30 @@ class _RegisterPageState extends State<RegisterPage> {
                       titleColor: Colors.white,
                       title: !isSwitch ? 'Registrarse' : 'Login con ',
                       isSignedGoogle: isSwitch,
-                      onPressed: () {
-
+                      onPressed: () async {
                         if (isSwitch) {
                           if (_checkDataNameAndLastName()) {
+                            UserCredential userCredential =
+                                await AuthService().signInWithGoogle();
+                            debugPrint('Credential: $userCredential');
+
+                            final userGoogle =
+                                FirebaseAuth.instance.currentUser;
                             UserModel user = UserModel(
-                              email: emailTextController.text ?? "",
+                              email: emailTextController.text,
                               name: nameTextController.text,
                               lastName: lastNameTextController.text,
                               age: int.parse(ageTextController.text),
+                              userToken: "",
                             );
-
-                            AuthService().signInWithGoogle();
-                            final userGoogle = FirebaseAuth.instance.currentUser;
                             user.email = userGoogle!.email!;
+                            user.userToken = userGoogle.uid;
                             addUserDetailsToFirebase(user);
                           }
                         } else {
                           _checkDataSignInWithEmailAndPassword();
                         }
+                        Navigator.pop(context);
                       }),
                 ],
               ),
@@ -209,13 +216,14 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _checkDataNameAndLastName() {
     if (nameTextController.text.isEmpty ||
         lastNameTextController.text.isEmpty) {
-      showAlert(context, 'Error', 'Contenido vacío Nombre o Apellido', Icons.error);
+      showAlert(
+          context, 'Error', 'Contenido vacío Nombre o Apellido', Icons.error);
       return false;
     }
     return true;
   }
 
-  bool _checkDataSignInWithEmailAndPassword() {
+  Future<bool> _checkDataSignInWithEmailAndPassword() async {
     _checkDataNameAndLastName();
     if (passwordTextController.text != confirmTextController.text) {
       showAlert(context, 'Error', 'El Password debe ser igual en ambos campos.',
@@ -229,14 +237,18 @@ class _RegisterPageState extends State<RegisterPage> {
       return false;
     }
     UserModel user = UserModel(
-      email: emailTextController.text,
-      name: nameTextController.text,
-      lastName: lastNameTextController.text,
-      age: int.parse(ageTextController.text),
-    );
-    registerNewUserWithEmailAndPassword(
+        email: emailTextController.text,
+        name: nameTextController.text,
+        lastName: lastNameTextController.text,
+        age: int.parse(ageTextController.text),
+        userToken: '');
+    User? userRegister = await registerNewUserWithEmailAndPassword(
         emailTextController.text, passwordTextController.text);
-    addUserDetailsToFirebase(user);
-    return true;
+    if (userRegister != null) {
+      user.userToken = userRegister.uid;
+      addUserDetailsToFirebase(user);
+      return true;
+    }
+    return false;
   }
 }

@@ -31,20 +31,30 @@ Future<void> firebaseSignUserIn(
   }
 }
 
-Future<void> registerNewUserWithEmailAndPassword(
+Future<User?> registerNewUserWithEmailAndPassword(
     String email, String password) async {
+  User? user;
+
   ///Create user
-  await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: email.trim(), password: password.trim());
+  try {
+    UserCredential userCredential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(
+            email: email.trim(), password: password.trim());
+    user = userCredential.user;
+  } catch (e) {
+    debugPrint('Error al registrar el usuario: $e');
+  }
+  return user;
 }
 
 ///Add User deteails
 Future addUserDetailsToFirebase(UserModel user) async {
-  await FirebaseFirestore.instance.collection('users').add({
+  await FirebaseFirestore.instance.collection('users').doc(user.userToken).set({
     'name': user.name,
     'lastname': user.lastName,
     'age': user.age,
     'email': user.email,
+    'userToken': user.userToken,
   });
 }
 

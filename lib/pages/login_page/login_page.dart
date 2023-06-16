@@ -1,10 +1,12 @@
 import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:pantry_inventory/models/user_model.dart';
 import 'package:pantry_inventory/pages/register_page/register_page.dart';
 import 'package:pantry_inventory/services/register_firebase.dart';
 import 'package:pantry_inventory/services/register_google.dart';
@@ -58,10 +60,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           height: double.infinity,
           width: double.infinity,
           decoration: const BoxDecoration(
-            // image: DecorationImage(
-            //     colorFilter: ColorFilter.mode(Colors.white70, BlendMode.color),
-            //     image: AssetImage(backgroundImage),
-            //     fit: BoxFit.cover),
             color: kBackgroundColor,
           ),
           child: Stack(
@@ -86,8 +84,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                 PageTransition(
                                     opaque: true,
                                     duration: const Duration(milliseconds: 600),
+                                    reverseDuration:
+                                        const Duration(milliseconds: 0),
                                     type: PageTransitionType.bottomToTop,
-                                    child: RegisterPage()));
+                                    child: const RegisterPage()));
                           });
                         },
                       ),
@@ -128,6 +128,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                               topLeft: Radius.circular(30),
                               topRight: Radius.circular(30))),
                       child: SingleChildScrollView(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
                         child: Column(
@@ -190,22 +192,44 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                 titleColor: Colors.white,
                                 title: 'Acceder',
                                 onPressed: () {
-                                  if(emailTextController.text.isEmpty || passTextController.text.isEmpty){
-                                    showAlert(context, 'Error', 'Email o Password vacío', Icons.error);
-                                  }
-                                  else {
+                                  if (emailTextController.text.isEmpty ||
+                                      passTextController.text.isEmpty) {
+                                    showAlert(context, 'Error',
+                                        'Email o Password vacío', Icons.error);
+                                  } else {
                                     firebaseSignUserIn(
-                                        context, emailTextController.text,
+                                        context,
+                                        emailTextController.text,
                                         passTextController.text);
-                                  }}),
+                                  }
+                                }),
                             const SizedBox(height: 15),
                             WideButton(
                                 backgroundColor: kBackgroundColor,
                                 titleColor: Colors.white,
-                                title: 'Acceder con ',
+                                title: 'Acceder con Google',
                                 isSignedGoogle: true,
-                                onPressed: () {
-                                  AuthService().signInWithGoogle();
+                                onPressed: () async {
+                                  //TODO hacer que se registre si no existe el usuario
+                                  UserCredential userCredential =
+                                      await AuthService().signInWithGoogle();
+                                  if (userCredential
+                                          .additionalUserInfo?.isNewUser ==
+                                      true) {
+                                    final userGoogle =
+                                        FirebaseAuth.instance.currentUser;
+                                    UserModel user = UserModel(
+                                      email: userCredential.user!.email!,
+                                      name: userCredential.additionalUserInfo!
+                                          .profile!['given_name'],
+                                      lastName: userCredential
+                                          .additionalUserInfo!
+                                          .profile!['family_name'],
+                                      age: 0,
+                                      userToken: userGoogle!.uid,
+                                    );
+                                    addUserDetailsToFirebase(user);
+                                  }
                                 }),
                             const SizedBox(height: 12),
                             Row(
@@ -225,9 +249,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                         Navigator.push(
                                             context,
                                             PageTransition(
+                                                reverseDuration: const Duration(
+                                                    milliseconds: 0),
                                                 type: PageTransitionType
                                                     .bottomToTop,
-                                                child: RegisterPage())));
+                                                child: const RegisterPage())));
                                   },
                                   child: Text(
                                     'Registrese.',
@@ -282,13 +308,14 @@ class WideButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            if (isSignedGoogle)
+              Icon(FontAwesomeIcons.google, color: titleColor),
+            if (isSignedGoogle) const SizedBox(width: 10),
             Text(
               title,
               style: GoogleFonts.outfit(
                   fontSize: 20, fontWeight: FontWeight.bold, color: titleColor),
             ),
-            if (isSignedGoogle) const SizedBox(width: 5),
-            if (isSignedGoogle) Icon(FontAwesomeIcons.google, color: titleColor)
           ],
         ),
       ),

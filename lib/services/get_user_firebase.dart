@@ -1,23 +1,41 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:pantry_inventory/models/user_model.dart';
 
-class GetUserName extends StatelessWidget {
-  const GetUserName({Key? key, required this.documentId}) : super(key: key);
+Future<UserModel?> readUserDataFromFirebase(String documentId) async {
+  UserModel? userModel;
+  try {
+    final documentSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(documentId)
+        .get();
 
-  final String documentId;
-
-  @override
-  Widget build(BuildContext context) {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
-    return FutureBuilder<DocumentSnapshot>(
-        future: users.doc(documentId).get(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            Map<String, dynamic> data =
-                snapshot.data!.data() as Map<String, dynamic>;
-            return Text('${data['first name']} ${data['last name']}');
-          }
-          return const Text('Loading...');
-        });
+    if (documentSnapshot.exists) {
+      debugPrint('Documento encontrado: ${documentSnapshot.data()}');
+      return UserModel.fromJson(documentSnapshot.data()!);
+    } else {
+      debugPrint('El documento no existe');
+    }
+  } catch (e) {
+    debugPrint('Error al leer el documento: $e');
   }
+  return userModel;
+}
+
+int checkAuthMethod() {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    List<String> providers =
+        user.providerData.map((userInfo) => userInfo.providerId).toList();
+    if (providers.contains('password')) {
+      return 0;
+    }
+    if (providers.contains('google.com')) {
+      return 1;
+    }
+  } else {
+    debugPrint('El usuario no está autenticado.');
+  }
+  return -1;
 }
