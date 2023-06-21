@@ -6,8 +6,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pantry_inventory/constants.dart';
 import 'package:pantry_inventory/models/user_model.dart';
-import 'package:pantry_inventory/services/register_firebase.dart';
-import 'package:pantry_inventory/services/register_google.dart';
+import 'package:pantry_inventory/services/register_firebase_services.dart';
+import 'package:pantry_inventory/services/register_google_services.dart';
 
 import '../../widgets.dart';
 import '../login_page/login_page.dart';

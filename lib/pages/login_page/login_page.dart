@@ -8,8 +8,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pantry_inventory/models/user_model.dart';
 import 'package:pantry_inventory/pages/register_page/register_page.dart';
-import 'package:pantry_inventory/services/register_firebase.dart';
-import 'package:pantry_inventory/services/register_google.dart';
+import 'package:pantry_inventory/services/register_firebase_services.dart';
+import 'package:pantry_inventory/services/register_google_services.dart';
 import 'package:pantry_inventory/widgets.dart';
 
 import '../../constants.dart';

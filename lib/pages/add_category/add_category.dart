@@ -1,11 +1,10 @@
 import 'dart:io';
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:pantry_inventory/constants.dart';
+import 'package:pantry_inventory/models/categories_model.dart';
 import 'package:pantry_inventory/pages/login_page/login_page.dart';
 import 'package:pantry_inventory/widgets.dart';
 
@@ -21,11 +20,11 @@ class AddCategory extends StatefulWidget {
 class _AddCategoryState extends State<AddCategory> {
   PlatformFile? pickedFile;
   UploadTask? uploadTask;
+  TextEditingController addTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    TextEditingController addTextController = TextEditingController();
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
@@ -83,7 +82,7 @@ class _AddCategoryState extends State<AddCategory> {
                     titleColor: kBackgroundColor,
                     title: "Subir Imagen",
                     onPressed: () async {
-                      String url = await           uploadFile();
+                      String url = await uploadFile();
                       newCategory(url, addTextController.text);
                       Navigator.pop(context);
                     }),
@@ -103,18 +102,22 @@ class _AddCategoryState extends State<AddCategory> {
     final snapshot = await uploadTask!.whenComplete(() => {});
     final urlDownload = await snapshot.ref.getDownloadURL();
     debugPrint('Download Link: $urlDownload');
-    setState(() {
-
-    });
+    setState(() {});
     return urlDownload;
   }
 
-  void newCategory(String url, String newCategory) {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    CollectionReference categoriesRef = firestore.collection('categories');
-    DocumentReference docRef = categoriesRef.doc(newCategory);
-    CollectionReference photosRef = docRef.collection('photos');
-    DocumentReference urlRef = photosRef.doc('url');
-    urlRef.set({'url': url});
+  Future<void> newCategory(String url, String newCategory) async {
+
+
+    final docUser =
+        FirebaseFirestore.instance.collection('categories').doc(newCategory);
+
+
+    final categoryToSave =
+        CategoryModel(nameCategory: newCategory, urlCategoryImage: url);
+    final json = categoryToSave.toJson();
+
+    ///Create document and write data to Firebase
+    await docUser.set(json);
   }
 }
