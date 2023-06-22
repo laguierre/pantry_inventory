@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -122,4 +124,53 @@ void showAlert(
           ],
         );
       });
+}
+
+class GlassmorphismContainer extends StatelessWidget {
+  const GlassmorphismContainer({
+    super.key,
+    this.width = double.infinity,
+    this.height = double.infinity,
+    required this.widget,
+  });
+
+  final double width;
+  final double height;
+  final Widget widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(40), bottomLeft: Radius.circular(40)),
+        color: Colors.white.withOpacity(0.1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.white.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 0),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(40),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Center(
+              child: widget,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

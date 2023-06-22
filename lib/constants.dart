@@ -6,3 +6,4 @@ const kRedColorButton = Color(0xFFEE4D2A);
 const kTextEditColor = Color(0xFFE0E6EE);
 
 const placeHolderCategory = 'lib/assets/images/placeholder_food.png';
+const subcategoryCollection = 'subcaterogy';

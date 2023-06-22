@@ -1,10 +1,15 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:image_fade/image_fade.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pantry_inventory/constants.dart';
 import 'package:pantry_inventory/data/data.dart';
 import 'package:pantry_inventory/models/categories_model.dart';
+import 'package:pantry_inventory/pages/subproduct_page/subproduct_page.dart';
 import 'package:pantry_inventory/services/categories_firebase_services.dart';
+import 'package:pantry_inventory/widgets.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../add_category/add_category.dart';
 
@@ -46,18 +51,16 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Future<void> fetchData(String subcategory) async {
-    if (subcategory != "") {
-      setState(() {
-        data = {}; // Limpiar los datos existentes
-        isLoading = true; // Mostrar indicador de carga
-      });
-      Map<String, dynamic> newData =
-          await searchSubcategoriesOnFirebase(subcategory);
-      setState(() {
-        data = newData; // Actualizar los datos con los nuevos valores
-        isLoading = false; // Ocultar indicador de carga
-      });
-    }
+    setState(() {
+      data = {}; // Limpiar los datos existentes
+      isLoading = true; // Mostrar indicador de carga
+    });
+    Map<String, dynamic> newData =
+        await searchSubcategoriesOnFirebase(subcategory);
+    setState(() {
+      data = newData; // Actualizar los datos con los nuevos valores
+      isLoading = false; // Ocultar indicador de carga
+    });
   }
 
   @override
@@ -65,65 +68,121 @@ class _CategoryPageState extends State<CategoryPage> {
     return Scaffold(
       backgroundColor: kBackgroundColor,
       extendBody: true,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: kBackgroundColor,
-        onPressed: () {
-          Navigator.push(
-              context,
-              PageTransition(
-                  opaque: true,
-                  duration: const Duration(milliseconds: 300),
-                  reverseDuration: const Duration(milliseconds: 300),
-                  type: PageTransitionType.rightToLeft,
-                  child: const AddCategory(title: 'Agregar categoría')));
-        },
-        child: Image.asset(plusImage, fit: BoxFit.fitHeight),
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.only(left: 40, bottom: 15),
+        height: 70,
+        child: GlassmorphismContainer(
+            widget: Row(
+          children: [
+            const Spacer(),
+            SmoothPageIndicator(
+                controller: titlePageController,
+                count: widget.categories.length,
+                effect: const ScrollingDotsEffect(
+                    maxVisibleDots: 7,
+                    activeDotColor: kBackgroundColor,
+                    activeDotScale: 1.6,
+                    spacing: 12),
+                // your preferred effect
+                onDotClicked: (index) {}),
+            const Spacer(),
+            FloatingActionButton(
+              backgroundColor: kBackgroundColor,
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    PageTransition(
+                        opaque: true,
+                        duration: const Duration(milliseconds: 300),
+                        reverseDuration: const Duration(milliseconds: 300),
+                        type: PageTransitionType.rightToLeft,
+                        child: const AddCategory(title: 'Agregar categoría')));
+              },
+              child: Image.asset(plusImage, fit: BoxFit.fitHeight),
+            ),
+            const SizedBox(width: 15)
+          ],
+        )),
       ),
       body: Column(
         children: [
           const SizedBox(height: 80),
-          Container(
-            padding: const EdgeInsets.only(left: 20),
-            height: 60,
-            child: PageView.builder(
-              padEnds: false,
-              reverse: false,
-              controller: titlePageController,
-              physics: const BouncingScrollPhysics(),
-              scrollDirection: Axis.horizontal,
-              itemCount: widget.categories.length,
-              onPageChanged: (page) async {
-                fetchData(widget.categories[page]
-                    .nameCategory); // Volver a disparar el futuro al cambiar de página
-              },
-              itemBuilder: (BuildContext context, int index) {
-                return CategoryName(widget: widget, index: index);
-              },
-            ),
-          ),
           Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.separated(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      itemCount: data.length,
-                      itemBuilder: (context, i) {
-                        String key = data.keys.elementAt(i);
-                        dynamic value = data[key];
-                        return SubcategoryNameTitle(
-                            subCategoryName: value.toString());
-                      },
-                      separatorBuilder: (_, __) {
-                        return Container(
-                            height: 1,
-                            color: Colors.grey);
-                      },
-                    ))
+              child: PageView.builder(
+            padEnds: false,
+            controller: titlePageController,
+            physics: const BouncingScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            itemCount: widget.categories.length,
+            onPageChanged: (page) async {
+              fetchData(widget.categories[page]
+                  .nameCategory); // Volver a disparar el futuro al cambiar de página
+            },
+            itemBuilder: (BuildContext context, int index) {
+              return Column(
+                children: [
+                  Container(
+                      padding: const EdgeInsets.only(left: 20),
+                      height: 60,
+                      child: CategoryName(widget: widget, index: index)),
+                  SubCategoryList(
+
+                    isLoading: isLoading,
+                    data: data, category: widget.categories[index].nameCategory,
+                  ),
+                ],
+              );
+            },
+          )),
         ],
       ),
     );
+  }
+}
+
+class SubCategoryList extends StatelessWidget {
+  const SubCategoryList({
+    super.key,
+    required this.isLoading,
+    required this.data, required this.category,
+  });
+
+  final bool isLoading;
+  final Map<String, dynamic> data;
+  final String category;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView.separated(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+                itemCount: data.length,
+                itemBuilder: (context, i) {
+                  String key = data.keys.elementAt(i);
+                  String value = data[key];
+                  return SubcategoryNameTitle(
+                    subCategoryName: value.toString(),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          PageTransition(
+                              opaque: true,
+                              duration: const Duration(milliseconds: 300),
+                              reverseDuration:
+                                  const Duration(milliseconds: 300),
+                              type: PageTransitionType.rightToLeft,
+                              child: SubCategoryPage(
+                                  index: i, subCategory: key, category: category)));
+                    },
+                  );
+                },
+                separatorBuilder: (_, __) {
+                  return Container(height: 1, color: Colors.grey);
+                },
+              ));
   }
 }
 
@@ -175,9 +234,11 @@ class CategoryName extends StatelessWidget {
 }
 
 class SubcategoryNameTitle extends StatelessWidget {
-  const SubcategoryNameTitle({super.key, required this.subCategoryName});
+  const SubcategoryNameTitle(
+      {super.key, required this.subCategoryName, required this.onPressed});
 
   final String subCategoryName;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -194,7 +255,7 @@ class SubcategoryNameTitle extends StatelessWidget {
             ),
             const Spacer(),
             IconButton(
-                onPressed: () {},
+                onPressed: onPressed,
                 icon: const Icon(
                   Icons.arrow_forward_ios_rounded,
                   color: Colors.white,
