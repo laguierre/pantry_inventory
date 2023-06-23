@@ -60,6 +60,7 @@ Future<Map<String, dynamic>> searchSubcategoriesOnFirebase(
     return {};
   }
 }
+
 ///Obtiene los valores de los elementos que tiene una subcategoría
 ///colección: subcategory, documento: almacen, subcolleccion: aceites
 Future<List<String>> getSubcategoriesCollectionOnFirebase(
@@ -75,8 +76,29 @@ Future<List<String>> getSubcategoriesCollectionOnFirebase(
     return querySnapshot.docs.map((documentSnapshot) {
       return documentSnapshot.id;
     }).toList();
+  } catch (e) {
+    debugPrint('Error searching subcategories on Firebase: $e');
+    return [];
+  }
+}
+
+///Obtiene los valores de los almacenados que tiene una subcategoría
+///colección: subcategory, documento: almacen, subcolleccion: aceites
+Future<List<String>> getSubcategoriesFieldsOnFirebase(
+    String category, String subCategory) async {
+  try {
+    print(subCategory);
+    var querySnapshot = await FirebaseFirestore.instance
+        .collection(subcategoryCollection)
+        .doc(category)
+        .collection(subCategory)
+        .get();
+
+    var fields = querySnapshot.docs.map((snapshot) => snapshot.data()).toList();
+    print(fields);
 
     ///print(documentSnapshot.docs.map((snapshot) => snapshot.data()).toList()); [{Cañuelas: {cantidad: 1}, Natura: {urlPhoto: , precio: 100, cantidad: 2, capacidad: 900 ml}}, {}, {}, {}]
+    return [];
   } catch (e) {
     debugPrint('Error searching subcategories on Firebase: $e');
     return [];
