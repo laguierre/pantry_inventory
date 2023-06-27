@@ -149,7 +149,7 @@ class GlassmorphismContainer extends StatelessWidget {
         color: Colors.white.withOpacity(0.1),
         boxShadow: [
           BoxShadow(
-            color: Colors.white.withOpacity(0.1),
+            color: kBackgroundColor.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 10,
             offset: const Offset(0, 0),
@@ -162,7 +162,7 @@ class GlassmorphismContainer extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: kBackgroundColor.withOpacity(0.05),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Center(
@@ -172,5 +172,42 @@ class GlassmorphismContainer extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+
+class TitleAppBar extends StatelessWidget {
+  const TitleAppBar({
+    super.key,
+    required this.size,
+    required this.title,
+  });
+
+  final Size size;
+  final Widget title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        padding: const EdgeInsets.only(left: 10),
+        height: 60,
+        child: Row(
+          children: [
+            IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+                size: 30,
+              ),
+              splashRadius: 25,
+              padding: const EdgeInsets.only(left: 12.5),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(width: 10),
+            title
+          ],
+        ));
   }
 }

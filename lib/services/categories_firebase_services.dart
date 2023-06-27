@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pantry_inventory/models/product_model.dart';
 import '../constants.dart';
 import '../models/categories_model.dart';
 
@@ -84,23 +85,26 @@ Future<List<String>> getSubcategoriesCollectionOnFirebase(
 
 ///Obtiene los valores de los almacenados que tiene una subcategoría
 ///colección: subcategory, documento: almacen, subcolleccion: aceites
-Future<List<String>> getSubcategoriesFieldsOnFirebase(
-    String category, String subCategory) async {
-  try {
-    print(subCategory);
-    var querySnapshot = await FirebaseFirestore.instance
-        .collection(subcategoryCollection)
-        .doc(category)
-        .collection(subCategory)
-        .get();
+Future<List<ProductModel>> getSubcategoriesFieldsOnFirebase(
+    String category, String subCategory, String subType) async {
 
-    var fields = querySnapshot.docs.map((snapshot) => snapshot.data()).toList();
-    print(fields);
+  DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+      .instance
+      .collection(subcategoryCollection)
+      .doc(category)
+      .collection(subCategory)
+      .doc(subType)
+      .get();
 
-    ///print(documentSnapshot.docs.map((snapshot) => snapshot.data()).toList()); [{Cañuelas: {cantidad: 1}, Natura: {urlPhoto: , precio: 100, cantidad: 2, capacidad: 900 ml}}, {}, {}, {}]
-    return [];
-  } catch (e) {
-    debugPrint('Error searching subcategories on Firebase: $e');
-    return [];
+  Map<String, dynamic>? data = snapshot.data();
+  if (data != null) {
+    List<ProductModel> products = [];
+    data.forEach((key, value) {
+      ProductModel product = ProductModel.fromJson(value);
+      products.add(product);
+    });
+    return products;
+  } else {
+    return []; // Return an empty list if no data is found
   }
 }

@@ -64,66 +64,6 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         backgroundColor: kBackgroundColor,
         extendBody: true,
-        appBar: AppBar(
-            backgroundColor: kBackgroundColor,
-            elevation: 0,
-            title: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ClipOval(
-                      child: ImageFade(
-                          height: 45,
-                          width: 45,
-                          image: NetworkImage(urlPhoto),
-                          duration: const Duration(milliseconds: 500),
-                          syncDuration: const Duration(milliseconds: 150),
-                          alignment: Alignment.center,
-                          fit: BoxFit.scaleDown,
-                          placeholder: Image.asset(avatarPlaceHolder,
-                              fit: BoxFit.fitWidth),
-                          errorBuilder: (context, error) => Container(
-                                color: const Color(0xFF6F6D6A),
-                                alignment: Alignment.center,
-                                child: Image.asset(avatarPlaceHolder,
-                                    color: Colors.white,
-                                    height: 35,
-                                    fit: BoxFit.fitHeight),
-                              ))),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(width: 20),
-                      Text(
-                        userName,
-                        style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Text(userEmail,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          )),
-                    ],
-                  ),
-                  const Spacer(),
-                  IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: const Icon(
-                        Icons.logout,
-                        color: Colors.white,
-                        size: 35,
-                      ),
-                      onPressed: () {
-                        firebaseSignUserOut();
-                      })
-                ],
-              ),
-            )),
         floatingActionButton: FloatingActionButton(
           backgroundColor: kBackgroundColor,
           onPressed: () {
@@ -132,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                 PageTransition(
                     opaque: true,
                     duration: const Duration(milliseconds: 300),
-                    reverseDuration: const Duration(milliseconds: 300),
+                    reverseDuration: const Duration(milliseconds: 100),
                     type: PageTransitionType.rightToLeft,
                     child: const AddCategory(title: 'Agregar categoría')));
           },
@@ -147,9 +87,78 @@ class _HomePageState extends State<HomePage> {
                 ///Cargar imágenes de las categorías
                 return SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    child: CategoriesFoods(
-                      size: size,
-                      categories: categories,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 30, horizontal: 20),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              ClipOval(
+                                  child: ImageFade(
+                                      height: 45,
+                                      width: 45,
+                                      image: NetworkImage(urlPhoto),
+                                      duration:
+                                          const Duration(milliseconds: 500),
+                                      syncDuration:
+                                          const Duration(milliseconds: 150),
+                                      alignment: Alignment.center,
+                                      fit: BoxFit.scaleDown,
+                                      placeholder: Image.asset(
+                                          avatarPlaceHolder,
+                                          fit: BoxFit.fitWidth),
+                                      errorBuilder: (context, error) =>
+                                          Container(
+                                            color: const Color(0xFF6F6D6A),
+                                            alignment: Alignment.center,
+                                            child: Image.asset(
+                                                avatarPlaceHolder,
+                                                color: Colors.white,
+                                                height: 35,
+                                                fit: BoxFit.fitHeight),
+                                          ))),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(width: 20),
+                                  Text(
+                                    userName,
+                                    style: GoogleFonts.outfit(
+                                        fontSize: size.height * 0.025,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white),
+                                  ),
+                                  Text(
+                                    userEmail,
+                                    style: GoogleFonts.outfit(
+                                        fontSize: size.height * 0.018,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: const Icon(
+                                    Icons.logout,
+                                    color: Colors.white,
+                                    size: 35,
+                                  ),
+                                  onPressed: () {
+                                    firebaseSignUserOut();
+                                  })
+                            ],
+                          ),
+                        ),
+                        CategoriesFoods(
+                          size: size,
+                          categories: categories,
+                        ),
+                      ],
                     ));
               }
               return const Center(child: CircularProgressIndicator());
@@ -183,9 +192,10 @@ class CategoriesFoods extends StatelessWidget {
                     PageTransition(
                         opaque: true,
                         duration: const Duration(milliseconds: 300),
-                        reverseDuration: const Duration(milliseconds: 300),
-                        type: PageTransitionType.rightToLeft,
-                        child: CategoryPage(categories: categories, index: index)));
+                        reverseDuration: const Duration(milliseconds: 100),
+                        type: PageTransitionType.bottomToTop,
+                        child: CategoryPage(
+                            categories: categories, index: index)));
               },
               child: Container(
                   margin:
