@@ -12,6 +12,7 @@ class ProductModel {
   String urlPhoto;
   String unit;
   String brand;
+  int id;
 
   ProductModel({
     required this.qtyToBuy,
@@ -25,6 +26,7 @@ class ProductModel {
     required this.category,
     required this.urlPhoto,
     required this.unit,
+    required this.id,
   });
 
   Map<String, dynamic> toJson() => {
@@ -39,21 +41,24 @@ class ProductModel {
         'urlPhoto': urlPhoto,
         'unidad': unit,
         'marca': brand,
+        'id': id,
       };
 
   static ProductModel fromJson(Map<String, dynamic> json) => ProductModel(
         qtyToBuy: json['comprar'] ?? 0,
         price: json['precio'] ?? 0.0,
         pricePerUnit: json['precioxunitario'] ?? 0.0,
-        presentation: json['presentacion'] ?? "",
+        presentation: json['presentacion'] ?? "N/A",
         stock: json['stock'] ?? 0,
-        subType: json['subtipo'] ?? "",
-        subCategory: json['tipo'] ?? "",
-        category: json['category'] ?? "",
-        urlPhoto: json['urlPhoto'] ?? "",
-        unit: json['unidad'] ?? "",
-        brand: json['marca'] ?? "",
+        subType: json['subtipo'] ?? "N/A",
+        subCategory: json['tipo'] ?? "N/A",
+        category: json['category'] ?? "N/A",
+        urlPhoto: json['urlPhoto'] ?? "N/A",
+        unit: json['unidad'] ?? "N/A",
+        brand: json['marca'] ?? "N/A",
+        id: json['id'] ?? 0,
       );
+
   factory ProductModel.fromSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
     if (data != null) {

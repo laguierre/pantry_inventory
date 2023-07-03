@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:pantry_inventory/constants.dart';
+import 'package:pantry_inventory/provider/product_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'pages/home_page/home_page.dart';
@@ -14,6 +15,7 @@ Future<void> main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => PantryInventory()),
+      ChangeNotifierProvider(create: (context) => ProductProvider()),
     ],
     child: const MyApp(),
   ));

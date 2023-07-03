@@ -84,27 +84,23 @@ Future<List<String>> getSubcategoriesCollectionOnFirebase(
 }
 
 ///Obtiene los valores de los almacenados que tiene una subcategoría
-///colección: subcategory, documento: almacen, subcolleccion: aceites
+///colección: subcategory, documento: almacen, subcolleccion: aceites, subType: girasol
 Future<List<ProductModel>> getSubcategoriesFieldsOnFirebase(
     String category, String subCategory, String subType) async {
+  List<ProductModel> products = [];
 
-  DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
-      .instance
+  final collectionRef = FirebaseFirestore.instance
       .collection(subcategoryCollection)
       .doc(category)
       .collection(subCategory)
       .doc(subType)
-      .get();
+      .collection(subType);
 
-  Map<String, dynamic>? data = snapshot.data();
-  if (data != null) {
-    List<ProductModel> products = [];
-    data.forEach((key, value) {
-      ProductModel product = ProductModel.fromJson(value);
-      products.add(product);
-    });
-    return products;
-  } else {
-    return []; // Return an empty list if no data is found
-  }
+  await collectionRef.get().then((querySnapshot) {
+    for (var doc in querySnapshot.docs) {
+      final data = ProductModel.fromJson(doc.data());
+      products.add(data);
+    }
+  });
+  return products;
 }

@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'dart:ui';
 
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -210,4 +213,18 @@ class TitleAppBar extends StatelessWidget {
           ],
         ));
   }
+}
+
+Future<String> uploadFile(String folder, PlatformFile pickedFile) async {
+  UploadTask? uploadTask;
+
+  final path = '$folder/${pickedFile.name}';
+  final file = File(pickedFile.path!);
+
+  final ref = FirebaseStorage.instance.ref().child(path);
+  uploadTask = ref.putFile(file);
+  final snapshot = await uploadTask.whenComplete(() => {});
+  final urlDownload = await snapshot.ref.getDownloadURL();
+  debugPrint('Download Link: $urlDownload');
+  return urlDownload;
 }

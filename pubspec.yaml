@@ -50,6 +50,7 @@ dependencies:
   firebase_storage: ^11.2.2
   firebase_database: ^10.2.2
   smooth_page_indicator: ^1.1.0
+  image_picker: ^1.0.0
 
 dev_dependencies:
   flutter_test:

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:pantry_inventory/constants.dart';
 import 'package:pantry_inventory/models/categories_model.dart';
@@ -19,7 +18,6 @@ class AddCategory extends StatefulWidget {
 
 class _AddCategoryState extends State<AddCategory> {
   PlatformFile? pickedFile;
-  UploadTask? uploadTask;
   TextEditingController addTextController = TextEditingController();
 
   @override
@@ -60,9 +58,8 @@ class _AddCategoryState extends State<AddCategory> {
                   onPressed: () async {
                     final result = await FilePicker.platform.pickFiles();
                     if (result == null) return;
-                    setState(() {
-                      pickedFile = result.files.first;
-                    });
+                    pickedFile = result.files.first;
+                    setState(() {});
                   }),
               const SizedBox(height: 20),
               if (pickedFile != null)
@@ -82,7 +79,7 @@ class _AddCategoryState extends State<AddCategory> {
                     titleColor: kBackgroundColor,
                     title: "Subir Imagen",
                     onPressed: () async {
-                      String url = await uploadFile();
+                      String url = await uploadFile('category', pickedFile!);
                       newCategory(url, addTextController.text);
                       Navigator.pop(context);
                     }),
@@ -93,25 +90,11 @@ class _AddCategoryState extends State<AddCategory> {
     );
   }
 
-  Future<String> uploadFile() async {
-    final path = 'categories/${pickedFile!.name}';
-    final file = File(pickedFile!.path!);
 
-    final ref = FirebaseStorage.instance.ref().child(path);
-    uploadTask = ref.putFile(file);
-    final snapshot = await uploadTask!.whenComplete(() => {});
-    final urlDownload = await snapshot.ref.getDownloadURL();
-    debugPrint('Download Link: $urlDownload');
-    setState(() {});
-    return urlDownload;
-  }
 
   Future<void> newCategory(String url, String newCategory) async {
-
-
     final docUser =
         FirebaseFirestore.instance.collection('categories').doc(newCategory);
-
 
     final categoryToSave =
         CategoryModel(nameCategory: newCategory, urlCategoryImage: url);

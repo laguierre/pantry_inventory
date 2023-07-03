@@ -293,17 +293,18 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 class WideButton extends StatelessWidget {
   const WideButton(
       {super.key,
-      required this.backgroundColor,
-      required this.titleColor,
+      this.backgroundColor = kBackgroundColor,
+     this.titleColor = Colors.white,
       required this.title,
       required this.onPressed,
-      this.isSignedGoogle = false});
+      this.isSignedGoogle = false, this.fontSize = 20});
 
   final Color backgroundColor;
   final Color titleColor;
   final String title;
   final VoidCallback onPressed;
   final bool isSignedGoogle;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
@@ -326,7 +327,7 @@ class WideButton extends StatelessWidget {
             Text(
               title,
               style: GoogleFonts.outfit(
-                  fontSize: 20, fontWeight: FontWeight.bold, color: titleColor),
+                  fontSize: fontSize, fontWeight: FontWeight.bold, color: titleColor),
             ),
           ],
         ),

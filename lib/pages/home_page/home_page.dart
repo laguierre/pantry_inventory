@@ -83,7 +83,6 @@ class _HomePageState extends State<HomePage> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 final categories = snapshot.requireData;
-
                 ///Cargar imágenes de las categorías
                 return SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),

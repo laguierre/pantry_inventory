@@ -139,7 +139,9 @@ class _CategoryPageState extends State<CategoryPage>
                             ),
                             splashRadius: 25,
                             padding: const EdgeInsets.only(left: 12.5),
-                            onPressed: () {Navigator.pop(context);},
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
                           ),
                           const SizedBox(width: 10),
                           CategoryName(widget: widget, index: index),
@@ -266,12 +268,11 @@ class CategoryName extends StatelessWidget {
                         )))
             : Container(),
         const SizedBox(width: 20),
-        Text(
-          widget.categories[index].nameCategory.toUpperCase(),
-          style: GoogleFonts.outfit(
-    fontSize: size.height * 0.035,
-    fontWeight: FontWeight.w800,
-    color: Colors.white)),
+        Text(widget.categories[index].nameCategory.toUpperCase(),
+            style: GoogleFonts.outfit(
+                fontSize: size.height * 0.035,
+                fontWeight: FontWeight.w800,
+                color: Colors.white)),
       ],
     );
   }

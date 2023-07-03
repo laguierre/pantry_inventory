@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pantry_inventory/constants.dart';
 
-
 class NoProduct extends StatelessWidget {
   const NoProduct({
     super.key,
